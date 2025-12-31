@@ -1,23 +1,27 @@
 const counterDisplay = document.getElementById('counter');
 const addBtn = document.getElementById('addBtn');
-const resetBtn = document.getElementById('resetBtn');
+const URL_PLANILHA = "1aQge4rQccfv1KO_oZw-LaBpbhrOk1zngJ-jJwFBAcmE"; 
 
-let count = localStorage.getItem('sexCounter') || 0;
-counterDisplay.innerText = count;
-
-addBtn.addEventListener('click', () => {
-    count++;
-    updateDisplay();
-});
-
-resetBtn.addEventListener('click', () => {
-    if(confirm("Tem certeza que quer zerar o contador?")) {
-        count = 0;
-        updateDisplay();
-    }
-});
-
-function updateDisplay() {
-    counterDisplay.innerText = count + "😏"; 
-    localStorage.setItem('sexCounter', count);
+async function buscarValor() {
+    counterDisplay.innerText = "Carregando...";
+    const resposta = await fetch(URL_PLANILHA);
+    const valor = await resposta.text();
+    counterDisplay.innerText = valor + " 😏";
 }
+
+
+async function salvarValor(novoValor) {
+    await fetch(URL_PLANILHA, {
+        method: 'POST',
+        body: novoValor
+    });
+}
+
+addBtn.addEventListener('click', async () => {
+    let atual = parseInt(counterDisplay.innerText);
+    let novo = atual + 1;
+    counterDisplay.innerText = novo + " 😏"; 
+    await salvarValor(novo); 
+});
+
+buscarValor();
