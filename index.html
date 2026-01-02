@@ -15,13 +15,61 @@
         </div>
 
         <div class="button-group">
-            <button id="subBtn" class="btn-side">—</button>
-            <button id="addBtn">Registrar Momento</button>
+            <button id="subBtn" class="btn-side" onclick="subBtnClick()">—</button>
+            <button id="addBtn" onclick="addBtnClick()">Registrar Momento</button>
         </div>
 
-        <button id="resetBtn" class="secondary">Resetar Contador</button>
+        <button id="resetBtn" class="secondary" onclick="resetBtnClick()">Resetar Contador</button>
     </div>
-    <script src="script.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+      
+        const firebaseConfig = {
+          apiKey: "AIzaSyDei2yRUZ97j1geEMtiF7s4mARzh1mg2JM",
+          authDomain: "divy-bc62a.firebaseapp.com",
+          projectId: "divy-bc62a",
+          storageBucket: "divy-bc62a.firebasestorage.app",
+          messagingSenderId: "135778933660",
+          appId: "1:135778933660:web:9eccc7b3e22ce160330659",
+          measurementId: "G-MYPNCGBNYQ"
+        };
+      
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        const docRef = doc(db, "registros", "contador2026");
+      
+        const counterDisplay = document.getElementById('counter');
+      
+        onSnapshot(docRef, (docSnap) => {
+          if (docSnap.exists()) {
+            counterDisplay.innerText = docSnap.data().valor + " 😏";
+          } else {
+            setDoc(docRef, { valor: 0 });
+          }
+        });
+      
+
+        window.addBtnClick = async () => {
+          const snap = await getDoc(docRef);
+          const atual = snap.exists() ? snap.data().valor : 0;
+          await updateDoc(docRef, { valor: atual + 1 });
+        };
+      
+        window.subBtnClick = async () => {
+          const snap = await getDoc(docRef);
+          const atual = snap.exists() ? snap.data().valor : 0;
+          if (atual > 0) {
+            await updateDoc(docRef, { valor: atual - 1 });
+          }
+        };
+      
+        window.resetBtnClick = async () => {
+          if(confirm("Zerar a contagem?")) {
+            await updateDoc(docRef, { valor: 0 });
+          }
+        };
+      </script>
 </body>
 </html>
-
